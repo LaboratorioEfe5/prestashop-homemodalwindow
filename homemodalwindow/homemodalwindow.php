@@ -1,6 +1,7 @@
 <?php
 /*
 PRESTASHOPMODULE.COM
+Updated by somosf5.com
 */
 
 if (!defined('_CAN_LOAD_FILES_'))
@@ -27,7 +28,7 @@ class HomeModalWindow extends Module
 
 	function install()
 	{
-		if (!parent::install() OR !$this->registerHook('home'))
+		if (!parent::install() ||  !$this->registerHook('home')|| !$this->registerHook('header'))
 			return false;
 			$lngs  = Language::getLanguages(true);
 			$frms = array();
@@ -70,19 +71,55 @@ class HomeModalWindow extends Module
 		$iso = Language::getIsoById((int)($cookie->id_lang));
 		$isoTinyMCE = (file_exists(_PS_ROOT_DIR_.'/js/tiny_mce/langs/'.$iso.'.js') ? $iso : 'en');
 		$ad = dirname($_SERVER["PHP_SELF"]);
-		if (_PS_VERSION_ < '1.4.0.0')
-		$t .='<script src="http://js.nicedit.com/nicEdit-latest.js" type="text/javascript"></script>
-		<script type="text/javascript">bkLib.onDomLoaded(nicEditors.allTextAreas);</script>';
-		else
-		$t .='
+		
+		
+		if (version_compare(_PS_VERSION_, '1.4.0.0') >= 0)
+			$t .= '
 			<script type="text/javascript">	
-			var iso = \''.$isoTinyMCE.'\' ;
-			var pathCSS = \''._THEME_CSS_DIR_.'\' ;
-			var ad = \''.$ad.'\' ;
+				var iso = \''.(file_exists(_PS_ROOT_DIR_.'/js/tiny_mce/langs/'.$iso.'.js') ? $iso : 'en').'\' ;
+				var pathCSS = \''._THEME_CSS_DIR_.'\' ;
+				var ad = \''.dirname($_SERVER['PHP_SELF']).'\' ;
 			</script>
 			<script type="text/javascript" src="'.__PS_BASE_URI__.'js/tiny_mce/tiny_mce.js"></script>
 			<script type="text/javascript" src="'.__PS_BASE_URI__.'js/tinymce.inc.js"></script>
-		';
+			<script language="javascript" type="text/javascript">
+				id_language = Number('.$id_lang_default.');
+				tinySetup();
+			</script>';
+		else
+		{
+			$t .= '
+			<script type="text/javascript" src="'.__PS_BASE_URI__.'js/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
+			<script type="text/javascript">
+				tinyMCE.init({
+					mode : "textareas",
+					theme : "advanced",
+					plugins : "safari,pagebreak,style,layer,table,advimage,advlink,inlinepopups,media,searchreplace,contextmenu,paste,directionality,fullscreen",
+					theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
+					theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,help,code,,|,forecolor,backcolor",
+					theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,media,|,ltr,rtl,|,fullscreen",
+					theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,pagebreak",
+					theme_advanced_toolbar_location : "top",
+					theme_advanced_toolbar_align : "left",
+					theme_advanced_statusbar_location : "bottom",
+					theme_advanced_resizing : false,
+					content_css : "'.__PS_BASE_URI__.'themes/'._THEME_NAME_.'/css/global.css",
+					document_base_url : "'.__PS_BASE_URI__.'",
+					width: "600",
+					height: "auto",
+					font_size_style_values : "8pt, 10pt, 12pt, 14pt, 18pt, 24pt, 36pt",
+					template_external_list_url : "lists/template_list.js",
+					external_link_list_url : "lists/link_list.js",
+					external_image_list_url : "lists/image_list.js",
+					media_external_list_url : "lists/media_list.js",
+					elements : "nourlconvert",
+					entity_encoding: "raw",
+					convert_urls : false,
+					language : "'.(file_exists(_PS_ROOT_DIR_.'/js/tinymce/jscripts/tiny_mce/langs/'.$iso.'.js') ? $iso : 'en').'"
+				});
+				id_language = Number('.$id_lang_default.');
+			</script>';
+		}
 		
 		$t .= '
 		
@@ -157,5 +194,23 @@ class HomeModalWindow extends Module
 		));
 
 		return $this->display(__FILE__, 'homemodalwindow.tpl');
+	}
+	public function hookHeader($params)
+	{
+	    global $smarty, $cookie;
+        
+		if (version_compare(_PS_VERSION_,'1.5','<'))
+        {
+		   
+		    Tools::addCSS(_PS_CSS_DIR_.'jquery.fancybox-1.3.4.css', 'all');		   
+		    Tools::addJS(_PS_JS_DIR_.'jquery/jquery.fancybox-1.3.4.js');
+		}
+		else
+		{
+		    
+			$this->context->controller->addCSS(_PS_JS_DIR_.'jquery/plugins/fancybox/jquery.fancybox.css', 'all');
+			$this->context->controller->addJS(_PS_JS_DIR_.'jquery/plugins/fancybox/jquery.fancybox.js');
+		}
+
 	}
 }
