@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
 		'{/literal}{$content}{literal}',
 		{
 			'width'			    : 650,
-			'width'			    : 400,
+			'height'		    : 400,
 			'autoScale'  		: true,
 			'scrolling'  		: 'no'
 		});
