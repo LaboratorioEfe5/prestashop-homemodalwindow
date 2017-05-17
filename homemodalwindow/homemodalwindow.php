@@ -66,6 +66,10 @@ class HomeModalWindow extends Module
 	public function _displayForm(){
 		$this->__construct();
 		global $cookie;
+
+		// Agregado por mi para evitar el mensaje "undefined variable"
+		$id_lang_default = $cookie->id_lang;
+
 		$t='';
 		$t .= '<img src="../modules/homemodalwindow/logo.gif" style="float:left; margin-right:15px;"><b>'.$this->l('This module shows content by modal window at home page.').'</b><br /><br />';
 		$iso = Language::getIsoById((int)($cookie->id_lang));
